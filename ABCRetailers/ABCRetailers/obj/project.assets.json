@@ -6005,11 +6005,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\lab_services_student\\Documents\\CLDV6212\\POEPart2\\ABCRetailers\\ABCRetailers\\ABCRetailers.csproj",
+      "projectUniqueName": "C:\\Users\\lab_services_student\\Documents\\GitHub\\ST10395938_CLDV6212_POEFinal\\ABCRetailers\\ABCRetailers\\ABCRetailers.csproj",
       "projectName": "ABCRetailers",
-      "projectPath": "C:\\Users\\lab_services_student\\Documents\\CLDV6212\\POEPart2\\ABCRetailers\\ABCRetailers\\ABCRetailers.csproj",
+      "projectPath": "C:\\Users\\lab_services_student\\Documents\\GitHub\\ST10395938_CLDV6212_POEFinal\\ABCRetailers\\ABCRetailers\\ABCRetailers.csproj",
       "packagesPath": "C:\\Users\\lab_services_student\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\lab_services_student\\Documents\\CLDV6212\\POEPart2\\ABCRetailers\\ABCRetailers\\obj\\",
+      "outputPath": "C:\\Users\\lab_services_student\\Documents\\GitHub\\ST10395938_CLDV6212_POEFinal\\ABCRetailers\\ABCRetailers\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
