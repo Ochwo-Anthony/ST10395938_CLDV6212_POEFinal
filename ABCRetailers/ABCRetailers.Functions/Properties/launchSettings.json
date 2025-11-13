@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ABCRetailers.Functions": {
+        "commandName": "Project",
+        "commandLineArgs": "--port 7213",
+        "applicationUrl": "http://localhost:7213",
+        "launchBrowser": false
+    }
+  }
+}

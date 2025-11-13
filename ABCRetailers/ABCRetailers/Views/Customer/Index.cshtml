@@ -1,0 +1,214 @@
+﻿<!-- Views/Customer/Index.cshtml -->
+@model IEnumerable<ABCRetailers.Models.Customer>
+@{
+    ViewData["Title"] = "Customers";
+}
+
+<div class="card shadow-sm">
+    <!-- Header -->
+    <div class="card-header d-flex justify-content-between align-items-center bg-primary text-white">
+        <h4 class="mb-0"><i class="fas fa-users"></i> Customers</h4>
+        <a asp-action="Create" class="btn btn-light btn-sm">
+            <i class="fas fa-plus"></i> Add Customer
+        </a>
+    </div>
+
+    <!-- Search Section -->
+    <div class="card-body border-bottom">
+        <form method="get" asp-action="Index" class="row g-3 align-items-end">
+            <div class="col-md-8">
+                <label for="searchString" class="form-label">Search Customers</label>
+                <div class="input-group">
+                    <input type="text" class="form-control"
+                           id="searchString" name="searchString"
+                           placeholder="Search by customer name..."
+                           value="@ViewData["CurrentFilter"]">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+                <div class="form-text">Enter customer name to filter results</div>
+            </div>
+            <div class="col-md-4">
+                @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"] as string))
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Clear Search
+                    </a>
+                }
+            </div>
+        </form>
+    </div>
+
+    <!-- Table Body -->
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <p class="text-muted mb-0">
+                    Showing <strong>@Model.Count()</strong> customer(s)
+                    @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"] as string))
+                    {
+                        <span>for "<strong>@ViewData["CurrentFilter"]</strong>"</span>
+                    }
+                </p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Customer ID</th>
+                            <th>Name</th>
+                            <th>Surname</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Shipping Address</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var customer in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <code>
+                                        @(string.IsNullOrEmpty(customer?.Id)
+                                                                        ? "-"
+                                                                        : customer.Id.Substring(0, Math.Min(8, customer.Id.Length)) + "…")
+                            </code>
+                        </td>
+                        <td>@customer.Name</td>
+                        <td>@customer.Surname</td>
+                        <td>@customer.Username</td>
+                        <td>@customer.Email</td>
+                        <td>@customer.ShippingAddress</td>
+                        <td class="text-center">
+                            <div class="btn-group" role="group">
+                                <a asp-action="Edit" asp-route-id="@customer.Id"
+                                   class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger"
+                                        onclick="confirmDelete('@customer.Id', '@(customer.Name + " " + customer.Surname)')"
+                                        title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                @if (!string.IsNullOrEmpty(ViewData["CurrentFilter"] as string))
+                {
+                    <span>No customers found for "<strong>@ViewData["CurrentFilter"]</strong>".</span>
+                    <a asp-action="Index" class="alert-link">Show all customers</a>
+                }
+                else
+                {
+                    <span>No customers found.</span>
+                    <a asp-action="Create" class="alert-link">Add your first customer</a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete customer <strong id="customerName"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this script instead for client-side filtering -->
+@section Scripts {
+    <script>
+        function confirmDelete(customerId, customerName) {
+            document.getElementById('customerName').textContent = customerName;
+            document.getElementById('deleteForm').action =
+                '@Url.Action("Delete", "Customer")/' + encodeURIComponent(customerId);
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+
+        // Client-side search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchString');
+            const customerRows = document.querySelectorAll('tbody tr');
+            const resultsCount = document.querySelector('.text-muted strong');
+            const noResultsAlert = document.querySelector('.alert-info');
+            const tableContainer = document.querySelector('.table-responsive');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    let visibleCount = 0;
+
+                    customerRows.forEach(row => {
+                        const name = row.cells[1].textContent.toLowerCase();
+                        const surname = row.cells[2].textContent.toLowerCase();
+                        const fullName = name + ' ' + surname;
+
+                        if (name.includes(searchTerm) ||
+                            surname.includes(searchTerm) ||
+                            fullName.includes(searchTerm) ||
+                            searchTerm === '') {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+
+                    // Update results count
+                    if (resultsCount) {
+                        resultsCount.textContent = visibleCount;
+                    }
+
+                    // Show/hide no results message
+                    if (noResultsAlert && tableContainer) {
+                        if (visibleCount === 0 && searchTerm !== '') {
+                            noResultsAlert.style.display = 'block';
+                            tableContainer.style.display = 'none';
+                        } else {
+                            noResultsAlert.style.display = 'none';
+                            tableContainer.style.display = 'block';
+                        }
+                    }
+                });
+
+                // Clear search when Escape key is pressed
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        this.value = '';
+                        this.dispatchEvent(new Event('input'));
+                    }
+                });
+            }
+        });
+    </script>
+}
+}

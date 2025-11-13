@@ -1,0 +1,97 @@
+﻿@model IEnumerable<ABCRetailers.Models.Product>
+@{
+    ViewData["Title"] = "Products";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-box"></i> Products</h2>
+    <a asp-action="Create" class="btn btn-success shadow-sm">
+        <i class="fas fa-plus"></i> Add New Product
+    </a>
+</div>
+
+@if (Model != null && Model.Any())
+{
+    <div class="row g-4">
+        @foreach (var product in Model)
+        {
+            var shortId = !string.IsNullOrWhiteSpace(product?.Id)
+            ? (product.Id.Length > 8 ? product.Id[..8] + "…" : product.Id)
+            : "-";
+            var desc = product?.Description ?? "";
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-header bg-success text-white text-center">
+                        <h6 class="mb-0">@product?.ProductName</h6>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(product?.ImageUrl))
+                    {
+                        <img src="@product.ImageUrl" class="card-img-top" alt="@product.ProductName" style="height:180px; object-fit:cover;">
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-center justify-content-center bg-light" style="height:180px;">
+                            <i class="fas fa-image text-muted fa-2x"></i>
+                        </div>
+                    }
+                    <div class="card-body text-center">
+                        <p class="text-muted small mb-1">@((desc.Length > 50) ? desc.Substring(0, 50) + "…" : desc)</p>
+                        <p class="fw-bold text-success">@product?.Price.ToString("C")</p>
+                        <span class="badge bg-@(product?.StockAvailable > 10 ? "success" : product?.StockAvailable > 0 ? "warning" : "danger")">
+                            Stock: @product?.StockAvailable
+                        </span>
+                    </div>
+                    <div class="card-footer text-center bg-light">
+                        <div class="btn-group" role="group">
+                            <a asp-action="Edit" asp-route-id="@product?.Id" class="btn btn-sm btn-outline-success" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                    onclick="confirmDelete('@product?.Id','@product?.ProductName')" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> No products found.
+        <a asp-action="Create" class="alert-link">Add your first product</a>!
+    </div>
+}
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete product <strong id="productName"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete(productId, productName) {
+            document.getElementById('productName').textContent = productName || '';
+            document.getElementById('deleteForm').action = '/Product/Delete/' + (productId || '');
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
+    </script>
+}
