@@ -1,90 +1,98 @@
-﻿<!-- Views/Order/Details.cshtml -->
-@using ABCRetailers.Models
+﻿@using ABCRetailers.Models
 @model ABCRetailers.Models.Order
 @{
     ViewData["Title"] = "Order Details";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="text-warning"><i class="fas fa-receipt"></i> Order Details</h2>
-    <div>
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
-            <i class="fas fa-edit"></i> Edit
-        </a>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="fas fa-list"></i> Back to List
-        </a>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="card-title mb-0">Order Information</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Order ID:</strong></p>
-                        <p class="text-muted"><code>@Model.Id</code></p>
-
-                        <p><strong>Customer:</strong></p>
-                        <p class="text-muted">@Model.CustomerId</p>
-
-                        <p><strong>Product:</strong></p>
-                        <p class="text-muted">@(!string.IsNullOrWhiteSpace(Model.ProductName) ? Model.ProductName : Model.ProductId)</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Order Date (Local):</strong></p>
-                        <p class="text-muted">@FormatLocal(Model.OrderDateUtc)</p>
-
-                        <p><strong>Quantity:</strong></p>
-                        <p class="text-muted">@Model.Quantity</p>
-
-                        <p><strong>Status:</strong></p>
-                        <p><span class="badge bg-@Badge(Model.Status) fs-6">@Model.Status</span></p>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="h5 mb-1 fw-normal">Order Details</h3>
+                            <p class="mb-0 opacity-75 small">View order information</p>
+                        </div>
+                        <div>
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-light btn-sm">
+                                Edit
+                            </a>
+                            <a asp-action="Index" class="btn btn-outline-light btn-sm">
+                                Back to List
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-header bg-warning text-dark">
-                <h6 class="card-title mb-0">Pricing Details</h6>
-            </div>
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <span>Unit Price:</span>
-                    <span>@Model.UnitPrice.ToString("C")</span>
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="text-dark fw-medium mb-3">Order Information</h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong class="text-dark">Order ID:</strong></p>
+                                            <p class="text-muted"><code>@Model.Id</code></p>
+
+                                            <p><strong class="text-dark">Customer:</strong></p>
+                                            <p class="text-muted">@Model.CustomerId</p>
+
+                                            <p><strong class="text-dark">Product:</strong></p>
+                                            <p class="text-muted">@(!string.IsNullOrWhiteSpace(Model.ProductName) ? Model.ProductName : Model.ProductId)</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong class="text-dark">Order Date:</strong></p>
+                                            <p class="text-muted">@FormatLocal(Model.OrderDateUtc)</p>
+
+                                            <p><strong class="text-dark">Quantity:</strong></p>
+                                            <p class="text-muted">@Model.Quantity</p>
+
+                                            <p><strong class="text-dark">Status:</strong></p>
+                                            <p><span class="badge bg-@Badge(Model.Status)">@Model.Status</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light mb-3">
+                                <div class="card-body">
+                                    <h6 class="text-dark fw-medium mb-3">Pricing Details</h6>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-dark">Unit Price:</span>
+                                        <span class="text-dark">@Model.UnitPrice.ToString("C")</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="text-dark">Quantity:</span>
+                                        <span class="text-dark">@Model.Quantity</span>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <strong class="text-dark">Total:</strong>
+                                        <strong class="text-dark">@Model.TotalAmount.ToString("C")</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="text-dark fw-medium mb-3">System Information</h6>
+                                    <p class="mb-1"><strong class="text-dark">Order ID:</strong></p>
+                                    <p class="text-muted small"><code>@Model.Id</code></p>
+
+                                    <p class="mb-1"><strong class="text-dark">Customer ID:</strong></p>
+                                    <p class="text-muted small">@Model.CustomerId</p>
+
+                                    <p class="mb-0"><strong class="text-dark">Product ID:</strong></p>
+                                    <p class="text-muted small">@Model.ProductId</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="d-flex justify-content-between">
-                    <span>Quantity:</span>
-                    <span>@Model.Quantity</span>
-                </div>
-                <hr>
-                <div class="d-flex justify-content-between">
-                    <strong>Total:</strong>
-                    <strong class="text-success">@Model.TotalAmount.ToString("C")</strong>
-                </div>
-            </div>
-        </div>
-
-        <div class="card shadow-sm mt-3">
-            <div class="card-header bg-warning text-dark">
-                <h6 class="card-title mb-0">System Information</h6>
-            </div>
-            <div class="card-body">
-                <p><strong>Order ID:</strong></p>
-                <p class="text-muted small"><code>@Model.Id</code></p>
-
-                <p><strong>Customer ID:</strong></p>
-                <p class="text-muted small">@Model.CustomerId</p>
-
-                <p><strong>Product ID:</strong></p>
-                <p class="text-muted small">@Model.ProductId</p>
             </div>
         </div>
     </div>
@@ -96,8 +104,8 @@
 
     string Badge(OrderStatus status) => status switch
     {
-        OrderStatus.Submitted => "primary",
-        OrderStatus.Processing => "info",
+        OrderStatus.Submitted => "secondary",
+        OrderStatus.Processing => "dark",
         OrderStatus.Completed => "success",
         OrderStatus.Cancelled => "danger",
         _ => "secondary"

@@ -1,23 +1,130 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ABCRetailers.Authorization;
 using ABCRetailers.Models;
 using ABCRetailers.Models.ViewModels;
 using ABCRetailers.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ABCRetailers.Controllers
 {
+    [RequireAuth]
     public class OrderController : Controller
     {
         private readonly IFunctionsApi _api;
         public OrderController(IFunctionsApi api) => _api = api;
 
-        // LIST
+        // LIST - Now handles both Admin and Customer views
         public async Task<IActionResult> Index()
         {
-            var orders = await _api.GetOrdersAsync();
-            return View(orders.OrderByDescending(o => o.OrderDateUtc).ToList());
+            var username = HttpContext.Session.GetString("Username");
+            var role = HttpContext.Session.GetString("Role");
+            
+            try
+            {
+                var allOrders = await _api.GetOrdersAsync();
+                
+                if (role == "Customer")
+                {
+                    // For customers, only show their own orders
+                    var customerOrders = allOrders
+                        .Where(o => o.CustomerId == username) // Assuming CustomerId is the username
+                        .OrderByDescending(o => o.OrderDateUtc)
+                        .ToList();
+                    
+                    return View("CustomerOrders", customerOrders);
+                }
+                else
+                {
+                    // For admins, show all orders (existing logic)
+                    return View(allOrders.OrderByDescending(o => o.OrderDateUtc).ToList());
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error loading orders.";
+                if (role == "Customer")
+                    return View("CustomerOrders", new List<Order>());
+                else
+                    return View(new List<Order>());
+            }
         }
 
-        // CREATE (GET)
+        // CUSTOMER ORDERS VIEW (Separate view for customers)
+        public async Task<IActionResult> CustomerOrders()
+        {
+            var username = HttpContext.Session.GetString("Username");
+            var role = HttpContext.Session.GetString("Role");
+
+            if (role != "Customer")
+            {
+                TempData["Error"] = "Access denied.";
+                return RedirectToAction("Index");
+            }
+
+            try
+            {
+                var allOrders = await _api.GetOrdersAsync();
+                var allCustomers = await _api.GetCustomersAsync();
+
+                // Get the customer's actual ID
+                var customer = allCustomers.FirstOrDefault(c => c.Username == username);
+
+                if (customer == null)
+                {
+                    TempData["Error"] = "Customer profile not found.";
+                    return View(new List<Order>());
+                }
+
+                // Match orders by customer ID
+                var customerOrders = allOrders
+                    .Where(o => o.CustomerId == customer.Id)  // Use customer ID, not username
+                    .OrderByDescending(o => o.OrderDateUtc)
+                    .ToList();
+
+                return View(customerOrders);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error loading your orders.";
+                return View(new List<Order>());
+            }
+        }
+        
+
+        // CUSTOMER ORDER DELETE (Customers can only delete their own orders)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteCustomerOrder(string id)
+        {
+            var username = HttpContext.Session.GetString("Username");
+            var role = HttpContext.Session.GetString("Role");
+
+            if (role != "Customer")
+            {
+                TempData["Error"] = "Access denied.";
+                return RedirectToAction("Index");
+            }
+
+            try
+            {
+                // Verify the order belongs to the current customer
+                var order = await _api.GetOrderAsync(id);
+                if (order == null || order.CustomerId != username)
+                {
+                    TempData["Error"] = "Order not found or access denied.";
+                    return RedirectToAction("CustomerOrders");
+                }
+
+                await _api.DeleteOrderAsync(id);
+                TempData["Success"] = "Order deleted successfully!";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error deleting order: {ex.Message}";
+            }
+            return RedirectToAction("CustomerOrders");
+        }
+
+        // CREATE (GET) - ORIGINAL UNCHANGED
         public async Task<IActionResult> Create()
         {
             var customers = await _api.GetCustomersAsync();
@@ -31,7 +138,7 @@ namespace ABCRetailers.Controllers
             return View(vm);
         }
 
-        // CREATE (POST)
+        // CREATE (POST) - ORIGINAL UNCHANGED
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(OrderCreateViewModel model)
         {
@@ -75,7 +182,7 @@ namespace ABCRetailers.Controllers
             }
         }
 
-        // DETAILS
+        // DETAILS - ORIGINAL UNCHANGED
         public async Task<IActionResult> Details(string id)
         {
             if (string.IsNullOrWhiteSpace(id)) return NotFound();
@@ -83,7 +190,7 @@ namespace ABCRetailers.Controllers
             return order is null ? NotFound() : View(order);
         }
 
-        // EDIT (GET) - typically only status is editable
+        // EDIT (GET) - ORIGINAL UNCHANGED
         public async Task<IActionResult> Edit(string id)
         {
             if (string.IsNullOrWhiteSpace(id)) return NotFound();
@@ -91,7 +198,7 @@ namespace ABCRetailers.Controllers
             return order is null ? NotFound() : View(order);
         }
 
-        // EDIT (POST) - status only
+        // EDIT (POST) - ORIGINAL UNCHANGED
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Order posted)
         {
@@ -110,7 +217,7 @@ namespace ABCRetailers.Controllers
             }
         }
 
-        // DELETE
+        // DELETE - ORIGINAL UNCHANGED
         [HttpPost]
         public async Task<IActionResult> Delete(string id)
         {
@@ -126,7 +233,7 @@ namespace ABCRetailers.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // AJAX: price/stock lookup
+        // AJAX: price/stock lookup - ORIGINAL UNCHANGED
         [HttpGet]
         public async Task<JsonResult> GetProductPrice(string productId)
         {
@@ -151,7 +258,7 @@ namespace ABCRetailers.Controllers
             }
         }
 
-        // AJAX: status update
+        // AJAX: status update - ORIGINAL UNCHANGED
         [HttpPost]
         public async Task<IActionResult> UpdateOrderStatus(string id, string newStatus)
         {

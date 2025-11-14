@@ -1,0 +1,58 @@
+﻿@model ABCRetailers.Models.ViewModels.LoginViewModel
+
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow border-0">
+            <div class="card-header bg-dark text-white py-4">
+                <h3 class="card-title mb-0 text-center fw-normal">
+                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                </h3>
+            </div>
+            <div class="card-body p-5">
+                <!-- Display validation errors -->
+                @if (ViewData.ModelState.ErrorCount > 0)
+                {
+                    <div class="alert alert-danger border-0 shadow-sm mb-4">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <div asp-validation-summary="All" class="mb-0"></div>
+                    </div>
+                }
+
+                <form asp-action="Login" method="post">
+                    <div class="mb-4">
+                        <label asp-for="Username" class="form-label text-dark fw-medium">
+                            Username
+                        </label>
+                        <input asp-for="Username" class="form-control border" placeholder="Enter your username" />
+                        <span asp-validation-for="Username" class="text-danger small mt-1"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="PasswordHash" class="form-label text-dark fw-medium">
+                            Password
+                        </label>
+                        <input asp-for="PasswordHash" type="password" class="form-control border" placeholder="Enter your password" />
+                        <span asp-validation-for="PasswordHash" class="text-danger small mt-1"></span>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-dark btn-lg">
+                            Sign In
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4 pt-3 border-top">
+                    <p class="text-muted mb-3">Don't have an account?</p>
+                    <a asp-action="Register" class="btn btn-outline-dark">
+                        Create Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

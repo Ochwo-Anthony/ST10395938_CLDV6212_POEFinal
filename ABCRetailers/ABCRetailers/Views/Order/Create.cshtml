@@ -1,94 +1,96 @@
-﻿<!-- Views/Order/Create.cshtml -->
-@model ABCRetailers.Models.ViewModels.OrderCreateViewModel
+﻿@model ABCRetailers.Models.ViewModels.OrderCreateViewModel
 @{
     ViewData["Title"] = "Create Order";
 }
 
-<div class="card shadow-sm">
-    <div class="card-header bg-warning text-dark d-flex align-items-center">
-        <h2 class="mb-0"><i class="fas fa-shopping-cart"></i> Add Order</h2>
-    </div>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white py-4">
+                    <h3 class="h5 mb-0 fw-normal">Create Order</h3>
+                </div>
 
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-8">
-                <form asp-action="Create" method="post">
-                    @Html.AntiForgeryToken()
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                    <div class="form-group mb-3">
-                        <label asp-for="CustomerId" class="form-label">Select Customer</label>
-                        <select asp-for="CustomerId" class="form-select" id="customerSelect"
-                                asp-items="@(new SelectList(Model.Customers, nameof(ABCRetailers.Models.Customer.Id), nameof(ABCRetailers.Models.Customer.Username)))">
-                            <option value="">-- Select Customer --</option>
-                        </select>
-                        <span asp-validation-for="CustomerId" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label asp-for="ProductId" class="form-label">Select Product</label>
-                        <select asp-for="ProductId" class="form-select" id="productSelect"
-                                asp-items="@(new SelectList(Model.Products, nameof(ABCRetailers.Models.Product.Id), nameof(ABCRetailers.Models.Product.ProductName)))">
-                            <option value="">-- Select Product --</option>
-                        </select>
-                        <span asp-validation-for="ProductId" class="text-danger"></span>
-                    </div>
-
+                <div class="card-body p-4">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label asp-for="Quantity" class="form-label">Quantity</label>
-                                <input asp-for="Quantity" class="form-control" type="number" min="1" id="quantityInput" />
-                                <span asp-validation-for="Quantity" class="text-danger"></span>
-                                <div id="stockWarning" class="form-text text-warning" style="display:none;"></div>
-                            </div>
+                        <div class="col-md-8">
+                            <form asp-action="Create" method="post">
+                                @Html.AntiForgeryToken()
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 mb-4"></div>
+
+                                <div class="mb-3">
+                                    <label asp-for="CustomerId" class="form-label text-dark fw-medium">Select Customer</label>
+                                    <select asp-for="CustomerId" class="form-select border" id="customerSelect"
+                                            asp-items="@(new SelectList(Model.Customers, nameof(ABCRetailers.Models.Customer.Id), nameof(ABCRetailers.Models.Customer.Username)))">
+                                        <option value="">-- Select Customer --</option>
+                                    </select>
+                                    <span asp-validation-for="CustomerId" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="ProductId" class="form-label text-dark fw-medium">Select Product</label>
+                                    <select asp-for="ProductId" class="form-select border" id="productSelect"
+                                            asp-items="@(new SelectList(Model.Products, nameof(ABCRetailers.Models.Product.Id), nameof(ABCRetailers.Models.Product.ProductName)))">
+                                        <option value="">-- Select Product --</option>
+                                    </select>
+                                    <span asp-validation-for="ProductId" class="text-danger small"></span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="Quantity" class="form-label text-dark fw-medium">Quantity</label>
+                                            <input asp-for="Quantity" class="form-control border" type="number" min="1" id="quantityInput" />
+                                            <span asp-validation-for="Quantity" class="text-danger small"></span>
+                                            <div id="stockWarning" class="form-text text-muted" style="display:none;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-dark fw-medium">Unit Price</label>
+                                            <input type="text" class="form-control border bg-light" id="unitPriceDisplay" readonly placeholder="Select product" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-dark fw-medium">Total Price</label>
+                                            <input type="text" class="form-control border bg-light" id="totalPriceDisplay" readonly placeholder="$0.00" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label text-dark fw-medium">Status</label>
+                                    <select class="form-select border bg-light" disabled>
+                                        <option selected>Submitted (Default)</option>
+                                    </select>
+                                    <input type="hidden" asp-for="Status" value="Submitted" />
+                                    <div class="form-text text-muted">Status will be set to <strong>Submitted</strong> when the order is created.</div>
+                                </div>
+
+                                <div class="d-flex gap-2 pt-3 border-top">
+                                    <button type="submit" class="btn btn-dark" id="submitBtn">
+                                        Create Order
+                                    </button>
+                                    <a asp-action="Index" class="btn btn-outline-dark">
+                                        Cancel
+                                    </a>
+                                </div>
+                            </form>
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label class="form-label">Unit Price</label>
-                                <input type="text" class="form-control" id="unitPriceDisplay" readonly placeholder="Select product" />
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="text-dark fw-medium mb-3">Order Summary</h6>
+                                    <div id="orderSummary">
+                                        <p class="text-muted small">Select customer and product to see order summary</p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label class="form-label">Total Price</label>
-                                <input type="text" class="form-control" id="totalPriceDisplay" readonly placeholder="$0.00" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label class="form-label">Status</label>
-                        <select class="form-select" disabled>
-                            <option selected>Submitted (Default)</option>
-                        </select>
-                        @* IMPORTANT: disabled fields don't post; send the value via hidden input *@
-                        <input type="hidden" asp-for="Status" value="Submitted" />
-                        <div class="form-text">Status will be set to <strong>Submitted</strong> when the order is created.</div>
-                    </div>
-
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-warning" id="submitBtn">
-                            <i class="fas fa-save"></i> Create Order
-                        </button>
-                        <a asp-action="Index" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Cancel
-                        </a>
-                    </div>
-                </form>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-warning text-dark">
-                        <h6 class="card-title mb-0"><i class="fas fa-info-circle"></i> Order Summary</h6>
-                    </div>
-                    <div class="card-body">
-                        <div id="orderSummary">
-                            <p class="text-muted">Select customer and product to see order summary</p>
                         </div>
                     </div>
                 </div>
@@ -103,6 +105,7 @@
     }
 
     <script>
+        // JavaScript remains the same, only styling updated
         let unitPrice = 0;
         let inStock = 0;
         let productName = '';
@@ -153,14 +156,14 @@
         function validateQty() {
             const q = Number(qtyInput.value) || 0;
             if (inStock > 0 && q > inStock) {
-                stockWarnEl.textContent = `⚠️ Only ${inStock} in stock`;
+                stockWarnEl.textContent = `Only ${inStock} in stock`;
                 stockWarnEl.style.display = 'block';
                 stockWarnEl.className = 'form-text text-danger';
                 submitBtn.disabled = true;
                 return;
             }
             if (q > 0) {
-                stockWarnEl.textContent = `✅ ${q} reserved (stock: ${inStock})`;
+                stockWarnEl.textContent = `${q} reserved (stock: ${inStock})`;
                 stockWarnEl.style.display = 'block';
                 stockWarnEl.className = 'form-text text-success';
             } else {
@@ -185,29 +188,29 @@
 
             if (custSel.value && productSelect.value && q > 0) {
                 summary.innerHTML = `
-                  <div class="alert alert-info">
-                    <h6><i class="fas fa-shopping-cart"></i> Order Preview</h6>
-                    <p><strong>Customer:</strong><br/><small>${custTxt}</small></p>
-                    <p><strong>Product:</strong><br/><small>${productName}</small></p>
+                  <div class="alert alert-secondary">
+                    <h6 class="text-dark fw-medium">Order Preview</h6>
+                    <p class="mb-1"><strong>Customer:</strong><br/><small class="text-muted">${custTxt}</small></p>
+                    <p class="mb-1"><strong>Product:</strong><br/><small class="text-muted">${productName}</small></p>
                     <hr>
-                    <div class="row"><div class="col-6"><strong>Quantity:</strong></div><div class="col-6 text-end">${q}</div></div>
-                    <div class="row"><div class="col-6"><strong>Unit Price:</strong></div><div class="col-6 text-end">$${unitPrice.toFixed(2)}</div></div>
+                    <div class="row mb-1"><div class="col-6 text-dark">Quantity:</div><div class="col-6 text-end text-dark">${q}</div></div>
+                    <div class="row mb-1"><div class="col-6 text-dark">Unit Price:</div><div class="col-6 text-end text-dark">$${unitPrice.toFixed(2)}</div></div>
                     <hr>
-                    <div class="row"><div class="col-6"><strong>Total:</strong></div><div class="col-6 text-end"><span class="text-success h5">$${total.toFixed(2)}</span></div></div>
+                    <div class="row"><div class="col-6 text-dark fw-medium">Total:</div><div class="col-6 text-end"><span class="text-dark fw-bold">$${total.toFixed(2)}</span></div></div>
                   </div>`;
             } else if (custSel.value && productSelect.value) {
                 summary.innerHTML = `
-                  <div class="alert alert-warning">
-                    <h6><i class="fas fa-exclamation-triangle"></i> Almost Ready</h6>
-                    <p>Selected product: <strong>${productName || '—'}</strong></p>
-                    <p>Unit price: <strong>$${unitPrice.toFixed(2)}</strong></p>
-                    <p class="mb-0"><small>Enter quantity to complete order</small></p>
+                  <div class="alert alert-secondary">
+                    <h6 class="text-dark fw-medium">Almost Ready</h6>
+                    <p class="mb-1">Selected product: <strong class="text-dark">${productName || '—'}</strong></p>
+                    <p class="mb-1">Unit price: <strong class="text-dark">$${unitPrice.toFixed(2)}</strong></p>
+                    <p class="mb-0 text-muted"><small>Enter quantity to complete order</small></p>
                   </div>`;
             } else {
                 summary.innerHTML = `
                   <div class="alert alert-secondary">
-                    <h6><i class="fas fa-clipboard-list"></i> Order Summary</h6>
-                    <p class="text-muted mb-0">Select customer and product to see order preview</p>
+                    <h6 class="text-dark fw-medium">Order Summary</h6>
+                    <p class="text-muted mb-0 small">Select customer and product to see order preview</p>
                   </div>`;
             }
         }

@@ -1,0 +1,25 @@
+﻿@model ABCRetailers.Models.OrderStatus
+
+@{
+    var statusClass = Model switch
+    {
+        ABCRetailers.Models.OrderStatus.Submitted => "bg-secondary",
+        ABCRetailers.Models.OrderStatus.Processing => "bg-warning text-dark",
+        ABCRetailers.Models.OrderStatus.Completed => "bg-success",
+        ABCRetailers.Models.OrderStatus.Cancelled => "bg-danger",
+        _ => "bg-secondary"
+    };
+
+    var statusIcon = Model switch
+    {
+        ABCRetailers.Models.OrderStatus.Submitted => "fa-clock",
+        ABCRetailers.Models.OrderStatus.Processing => "fa-cog",
+        ABCRetailers.Models.OrderStatus.Completed => "fa-check-circle",
+        ABCRetailers.Models.OrderStatus.Cancelled => "fa-times-circle",
+        _ => "fa-question-circle"
+    };
+}
+
+<span class="badge @statusClass">
+    <i class="fas @statusIcon"></i> @Model
+</span>

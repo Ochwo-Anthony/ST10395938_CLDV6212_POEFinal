@@ -1,0 +1,95 @@
+﻿@model ABCRetailers.Models.Customer
+@{
+    ViewData["Title"] = "Edit My Profile";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <!-- Header -->
+                <div class="card-header bg-dark text-white py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="h5 mb-1 fw-normal">Edit My Profile</h3>
+                            <p class="mb-0 opacity-75 small">Update your personal information</p>
+                        </div>
+                        <a asp-action="Profile" class="btn btn-light btn-sm">
+                            Back to Profile
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Edit Form -->
+                <div class="card-body p-4">
+                    <form asp-action="EditProfile" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="Username" />
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0"></div>
+
+                        <!-- Personal Information -->
+                        <div class="mb-4">
+                            <h6 class="text-dark fw-medium mb-3 border-bottom pb-2">
+                                Personal Information
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Name" class="form-label text-dark fw-medium"></label>
+                                    <input asp-for="Name" class="form-control border" placeholder="Enter your first name" />
+                                    <span asp-validation-for="Name" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Surname" class="form-label text-dark fw-medium"></label>
+                                    <input asp-for="Surname" class="form-control border" placeholder="Enter your last name" />
+                                    <span asp-validation-for="Surname" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-dark fw-medium">Username</label>
+                                <input value="@Model.Username" class="form-control border bg-light" readonly />
+                                <small class="form-text text-muted">Username cannot be changed.</small>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Email" class="form-label text-dark fw-medium"></label>
+                                <input asp-for="Email" type="email" class="form-control border" placeholder="your.email@example.com" />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Information -->
+                        <div class="mb-4">
+                            <h6 class="text-dark fw-medium mb-3 border-bottom pb-2">
+                                Shipping Information
+                            </h6>
+                            <div class="mb-3">
+                                <label asp-for="ShippingAddress" class="form-label text-dark fw-medium"></label>
+                                <textarea asp-for="ShippingAddress" class="form-control border" rows="4"
+                                          placeholder="Enter your complete shipping address including street, city, postal code, etc."></textarea>
+                                <span asp-validation-for="ShippingAddress" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2 pt-3 border-top">
+                            <button type="submit" class="btn btn-dark flex-fill py-2">
+                                Save Changes
+                            </button>
+                            <a asp-action="Profile" class="btn btn-outline-dark py-2">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

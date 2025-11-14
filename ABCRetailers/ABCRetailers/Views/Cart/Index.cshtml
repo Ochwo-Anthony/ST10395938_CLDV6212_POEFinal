@@ -1,0 +1,147 @@
+﻿@model IEnumerable<ABCRetailers.Models.Cart>
+@inject ABCRetailers.Services.IFunctionsApi _api
+
+@{
+    ViewData["Title"] = "Shopping Cart";
+    var cartItems = Model.ToList();
+    decimal finalTotal = 0;
+
+    // Get product details for each cart item
+    var cartItemsWithDetails = new List<CartItemDetail>();
+    foreach (var item in cartItems)
+    {
+        var product = await _api.GetProductAsync(item.ProductId);
+        if (product != null)
+        {
+            var itemTotal = product.Price * item.Quantity;
+            finalTotal += itemTotal;
+
+            cartItemsWithDetails.Add(new CartItemDetail
+            {
+                CartItem = item,
+                Product = product,
+                Total = itemTotal
+            });
+        }
+    }
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white py-4">
+                    <h3 class="h5 mb-0 fw-normal">Shopping Cart</h3>
+                </div>
+                <div class="card-body p-4">
+                    @if (!cartItemsWithDetails.Any())
+                    {
+                        <div class="text-center py-4">
+                            <i class="fas fa-shopping-cart fa-3x text-muted opacity-50 mb-3"></i>
+                            <h5 class="text-dark mb-3">Your cart is empty</h5>
+                            <a asp-controller="Product" asp-action="Index" class="btn btn-dark">
+                                Continue Shopping
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th class="text-center">Price</th>
+                                        <th class="text-center">Quantity</th>
+                                        <th class="text-center">Total</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var itemDetail in cartItemsWithDetails)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    @if (!string.IsNullOrWhiteSpace(itemDetail.Product.ImageUrl))
+                                                    {
+                                                        <img src="@itemDetail.Product.ImageUrl"
+                                                             class="rounded me-3"
+                                                             alt="@itemDetail.Product.ProductName"
+                                                             style="width: 60px; height: 60px; object-fit: cover;">
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="bg-light rounded d-flex align-items-center justify-content-center me-3"
+                                                             style="width: 60px; height: 60px;">
+                                                            <i class="fas fa-image text-muted"></i>
+                                                        </div>
+                                                    }
+                                                    <div>
+                                                        <h6 class="mb-1 text-dark">@itemDetail.Product.ProductName</h6>
+                                                        <small class="text-muted">ID: @itemDetail.CartItem.ProductId</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center text-dark fw-medium">
+                                                @itemDetail.Product.Price.ToString("C")
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-dark fs-6">@itemDetail.CartItem.Quantity</span>
+                                            </td>
+                                            <td class="text-center text-dark fw-bold">
+                                                @itemDetail.Total.ToString("C")
+                                            </td>
+                                            <td class="text-end">
+                                                <form asp-action="Remove" method="post" class="d-inline">
+                                                    <input type="hidden" name="id" value="@itemDetail.CartItem.Id" />
+                                                    <button class="btn btn-outline-dark btn-sm"
+                                                            onclick="return confirm('Remove this item from cart?')">
+                                                        Remove
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <td colspan="3" class="text-end fw-bold text-dark">Final Total:</td>
+                                        <td class="text-center fw-bold fs-5 text-dark">@finalTotal.ToString("C")</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-4 border-top">
+                            <a asp-controller="Product" asp-action="Index" class="btn btn-outline-dark">
+                                <i class="fas fa-arrow-left me-2"></i>Continue Shopping
+                            </a>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="text-end">
+                                    <h5 class="text-dark mb-0">Total: @finalTotal.ToString("C")</h5>
+                                    <small class="text-muted">@cartItems.Count item(s) in cart</small>
+                                </div>
+                                <form asp-action="Checkout" method="post" class="d-inline">
+                                    <button class="btn btn-dark btn-lg px-4">
+                                        <i class="fas fa-shopping-bag me-2"></i>Proceed to Checkout
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    public class CartItemDetail
+    {
+        public Cart CartItem { get; set; } = null!;
+        public ABCRetailers.Models.Product Product { get; set; } = null!;
+        public decimal Total { get; set; }
+    }
+}

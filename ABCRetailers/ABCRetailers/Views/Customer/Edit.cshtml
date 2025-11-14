@@ -3,83 +3,91 @@
     ViewData["Title"] = "Edit Customer";
 }
 
-<div class="row">
-    <div class="col-md-8">
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
-                <h4 class="mb-0"><i class="fas fa-user-edit"></i> Edit Customer</h4>
-                <a asp-action="Index" class="btn btn-light btn-sm">
-                    <i class="fas fa-arrow-left"></i> Back
-                </a>
-            </div>
-            <div class="card-body">
-                <form asp-action="Edit" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" asp-for="Id" />
-
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i>
-                        <strong>Customer ID:</strong>
-                        @(string.IsNullOrEmpty(Model?.Id) ? "-" : Model.Id.Substring(0, Math.Min(8, Model.Id.Length)) + "…")
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Name" class="form-label"></label>
-                            <input asp-for="Name" class="form-control" />
-                            <span asp-validation-for="Name" class="text-danger"></span>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="h5 mb-1 fw-normal">Edit Customer</h3>
+                            <p class="mb-0 opacity-75 small">Update customer information</p>
                         </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Surname" class="form-label"></label>
-                            <input asp-for="Surname" class="form-control" />
-                            <span asp-validation-for="Surname" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Username" class="form-label"></label>
-                        <input asp-for="Username" class="form-control" />
-                        <span asp-validation-for="Username" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label"></label>
-                        <input asp-for="Email" class="form-control" type="email" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <label asp-for="ShippingAddress" class="form-label"></label>
-                        <textarea asp-for="ShippingAddress" class="form-control" rows="3"></textarea>
-                        <span asp-validation-for="ShippingAddress" class="text-danger"></span>
-                    </div>
-
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Update
-                        </button>
-                        <a asp-action="Index" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Cancel
+                        <a asp-action="Index" class="btn btn-light btn-sm">
+                            Back to Customers
                         </a>
                     </div>
-                </form>
-            </div>
-        </div>
-    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <form asp-action="Edit" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" asp-for="Id" />
 
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-header bg-light">
-                <h6 class="mb-0"><i class="fas fa-info-circle"></i> Customer Info</h6>
-            </div>
-            <div class="card-body">
-                <p>
-                    <strong>Full Customer ID:</strong><br />
-                    <small class="text-muted font-monospace">@Model?.Id</small>
-                </p>
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 mb-4"></div>
+
+                                <div class="alert alert-secondary border-0 mb-4">
+                                    <strong>Customer ID:</strong>
+                                    @(string.IsNullOrEmpty(Model?.Id) ? "-" : Model.Id.Substring(0, Math.Min(8, Model.Id.Length)) + "…")
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Name" class="form-label text-dark fw-medium"></label>
+                                        <input asp-for="Name" class="form-control border" />
+                                        <span asp-validation-for="Name" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Surname" class="form-label text-dark fw-medium"></label>
+                                        <input asp-for="Surname" class="form-control border" />
+                                        <span asp-validation-for="Surname" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Username" class="form-label text-dark fw-medium"></label>
+                                    <input asp-for="Username" class="form-control border" />
+                                    <span asp-validation-for="Username" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Email" class="form-label text-dark fw-medium"></label>
+                                    <input asp-for="Email" class="form-control border" type="email" />
+                                    <span asp-validation-for="Email" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="ShippingAddress" class="form-label text-dark fw-medium"></label>
+                                    <textarea asp-for="ShippingAddress" class="form-control border" rows="3"></textarea>
+                                    <span asp-validation-for="ShippingAddress" class="text-danger small"></span>
+                                </div>
+
+                                <div class="d-flex gap-2 pt-3 border-top">
+                                    <button type="submit" class="btn btn-dark">
+                                        Update Customer
+                                    </button>
+                                    <a asp-action="Index" class="btn btn-outline-dark">
+                                        Cancel
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="text-dark fw-medium mb-3">Customer Information</h6>
+                                    <p class="mb-2">
+                                        <strong>Full Customer ID:</strong><br />
+                                        <small class="text-muted">@Model?.Id</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

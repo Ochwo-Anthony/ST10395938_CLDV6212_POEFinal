@@ -1,9 +1,10 @@
-﻿using ABCRetailers.Models;
+﻿using System.Diagnostics;
+using ABCRetailers.Authorization;
+using ABCRetailers.Models;
 using ABCRetailers.Models.ViewModels;
 using ABCRetailers.Services;           // IFunctionsApi
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 
 namespace ABCRetailers.Controllers
 {
@@ -18,6 +19,29 @@ namespace ABCRetailers.Controllers
             _logger = logger;
         }
 
+        // Landing page for unauthenticated users (no [RequireAuth] attribute)
+        [HttpGet]
+        public async Task<IActionResult> Landing()
+        {
+            try
+            {
+                var products = await _api.GetProductsAsync();
+                var vm = new HomeViewModel
+                {
+                    FeaturedProducts = products?.Take(8).ToList() ?? new List<Product>()
+                };
+                return View(vm);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to load products for landing page.");
+                // Return empty model - landing page should still show even if products fail
+                return View(new HomeViewModel());
+            }
+        }
+
+        // Main dashboard for authenticated users
+        [RequireAuth]
         public async Task<IActionResult> Index()
         {
             try
@@ -52,6 +76,7 @@ namespace ABCRetailers.Controllers
             }
         }
 
+        [RequireAuth]
         public IActionResult Privacy() => View();
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

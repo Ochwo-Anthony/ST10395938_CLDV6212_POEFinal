@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ABCRetailers.Authorization;
 using ABCRetailers.Models;
 using ABCRetailers.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ABCRetailers.Controllers
 {
+    [RequireAuth]
     public class UploadController : Controller
     {
         private readonly IFunctionsApi _api;

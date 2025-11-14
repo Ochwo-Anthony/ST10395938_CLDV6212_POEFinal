@@ -1,115 +1,123 @@
-﻿<!-- Views/Order/Edit.cshtml -->
-@using ABCRetailers.Models
+﻿@using ABCRetailers.Models
 @model ABCRetailers.Models.Order
 @{
     ViewData["Title"] = "Edit Order";
 }
 
-<div class="card shadow-sm">
-    <div class="card-header bg-warning text-dark d-flex align-items-center">
-        <h4 class="mb-0"><i class="fas fa-edit"></i> Edit Order</h4>
-    </div>
-
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-8">
-                <form asp-action="Edit" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" asp-for="Id" />
-                    <input type="hidden" asp-for="CustomerId" />
-                    <input type="hidden" asp-for="ProductId" />
-                    <input type="hidden" asp-for="OrderDateUtc" />
-
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label class="form-label">Customer</label>
-                                <input type="text" class="form-control" value="@Model.CustomerId" readonly />
-                            </div>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="h5 mb-1 fw-normal">Edit Order</h3>
+                            <p class="mb-0 opacity-75 small">Update order information</p>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label class="form-label">Product</label>
-                                <input type="text" class="form-control" value="@(!string.IsNullOrWhiteSpace(Model.ProductName) ? Model.ProductName : Model.ProductId)" readonly />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label class="form-label">Order Date (Local)</label>
-                                <input class="form-control" value="@FormatLocal(Model.OrderDateUtc)" readonly />
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label asp-for="Quantity" class="form-label"></label>
-                                <input asp-for="Quantity" class="form-control" type="number" min="1" readonly />
-                                <div class="form-text text-warning">Quantity cannot be changed after order creation</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label class="form-label">Unit Price</label>
-                                <input type="text" class="form-control" value="@Model.UnitPrice.ToString("C")" readonly />
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group mb-3">
-                                <label class="form-label">Total</label>
-                                <input type="text" class="form-control" value="@Model.TotalAmount.ToString("C")" readonly />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label asp-for="Status" class="form-label"></label>
-                        @* Works if Order.Status is an enum *@
-                        <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<OrderStatus>()"></select>
-                        <span asp-validation-for="Status" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-warning">
-                            <i class="fas fa-save"></i> Update Order
-                        </button>
-                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-info">
-                            <i class="fas fa-eye"></i> View Details
-                        </a>
-                        <a asp-action="Index" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Cancel
+                        <a asp-action="Index" class="btn btn-light btn-sm">
+                            Back to Orders
                         </a>
                     </div>
-                </form>
-            </div>
+                </div>
 
-            <div class="col-md-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-warning text-dark">
-                        <h6 class="card-title mb-0">Order Summary</h6>
-                    </div>
-                    <div class="card-body">
-                        <p>
-                            <strong>Order ID:</strong><br />
-                            <small class="text-muted"><code>@Model.Id</code></small>
-                        </p>
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <form asp-action="Edit" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" asp-for="Id" />
+                                <input type="hidden" asp-for="CustomerId" />
+                                <input type="hidden" asp-for="ProductId" />
+                                <input type="hidden" asp-for="OrderDateUtc" />
 
-                        <p>
-                            <strong>Order Placed (Local):</strong><br />
-                            <small class="text-muted">@FormatLocal(Model.OrderDateUtc)</small>
-                        </p>
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger border-0 mb-4"></div>
 
-                        <p>
-                            <strong>Current Status:</strong><br />
-                            <span class="badge bg-@Badge(Model.Status)">@Model.Status</span>
-                        </p>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-dark fw-medium">Customer</label>
+                                            <input type="text" class="form-control border bg-light" value="@Model.CustomerId" readonly />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-dark fw-medium">Product</label>
+                                            <input type="text" class="form-control border bg-light" value="@(!string.IsNullOrWhiteSpace(Model.ProductName) ? Model.ProductName : Model.ProductId)" readonly />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-dark fw-medium">Order Date</label>
+                                            <input class="form-control border bg-light" value="@FormatLocal(Model.OrderDateUtc)" readonly />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="Quantity" class="form-label text-dark fw-medium"></label>
+                                            <input asp-for="Quantity" class="form-control border bg-light" type="number" min="1" readonly />
+                                            <div class="form-text text-muted">Quantity cannot be changed after order creation</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-dark fw-medium">Unit Price</label>
+                                            <input type="text" class="form-control border bg-light" value="@Model.UnitPrice.ToString("C")" readonly />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-dark fw-medium">Total</label>
+                                            <input type="text" class="form-control border bg-light" value="@Model.TotalAmount.ToString("C")" readonly />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="Status" class="form-label text-dark fw-medium"></label>
+                                    <select asp-for="Status" class="form-select border" asp-items="Html.GetEnumSelectList<OrderStatus>()"></select>
+                                    <span asp-validation-for="Status" class="text-danger small"></span>
+                                </div>
+
+                                <div class="d-flex gap-2 pt-3 border-top">
+                                    <button type="submit" class="btn btn-dark">
+                                        Update Order
+                                    </button>
+                                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-dark">
+                                        View Details
+                                    </a>
+                                    <a asp-action="Index" class="btn btn-outline-dark">
+                                        Cancel
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="text-dark fw-medium mb-3">Order Summary</h6>
+                                    <p class="mb-2">
+                                        <strong>Order ID:</strong><br />
+                                        <small class="text-muted"><code>@Model.Id</code></small>
+                                    </p>
+                                    <p class="mb-2">
+                                        <strong>Order Date:</strong><br />
+                                        <small class="text-muted">@FormatLocal(Model.OrderDateUtc)</small>
+                                    </p>
+                                    <p class="mb-0">
+                                        <strong>Current Status:</strong><br />
+                                        <span class="badge bg-@Badge(Model.Status)">@Model.Status</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -123,8 +131,8 @@
 
     string Badge(OrderStatus status) => status switch
     {
-        OrderStatus.Submitted => "primary",
-        OrderStatus.Processing => "info",
+        OrderStatus.Submitted => "secondary",
+        OrderStatus.Processing => "dark",
         OrderStatus.Completed => "success",
         OrderStatus.Cancelled => "danger",
         _ => "secondary"

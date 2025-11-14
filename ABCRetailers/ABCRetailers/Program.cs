@@ -1,12 +1,27 @@
 // Program.cs
+using System.Globalization;
+using ABCRetailers.Data;
 using ABCRetailers.Services;
 using Microsoft.AspNetCore.Http.Features;
-using System.Globalization;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // MVC
 builder.Services.AddControllersWithViews();
+
+// Session Configuration
+builder.Services.AddDistributedMemoryCache(); // Required for session storage
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Session expires after 30 minutes of inactivity
+    options.Cookie.HttpOnly = true; // Prevent JavaScript access for security
+    options.Cookie.IsEssential = true; // GDPR compliance - cannot be declined
+    options.Cookie.Name = "ABCRetailers.Session";
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.None  // Allow HTTP in development
+        : CookieSecurePolicy.Always; // Require HTTPS in production
+});
 
 // Typed HttpClient for your Azure Functions
 builder.Services.AddHttpClient("Functions", (sp, client) =>
@@ -29,6 +44,9 @@ builder.Services.Configure<FormOptions>(o =>
 // Optional: logging is added by default, keeping this is harmless
 builder.Services.AddLogging();
 
+builder.Services.AddDbContext<AuthDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AuthConnection")));
+
 var app = builder.Build();
 
 // Culture (your original fix for decimal handling)
@@ -48,8 +66,11 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 
+// Add Session middleware - IMPORTANT: Must be after UseRouting and before MapControllerRoute
+app.UseSession();
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Landing}/{id?}");
 
 app.Run();

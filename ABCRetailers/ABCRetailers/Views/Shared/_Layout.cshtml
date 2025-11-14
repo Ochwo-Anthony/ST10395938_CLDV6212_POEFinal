@@ -1,86 +1,180 @@
-﻿<!-- Views/Shared/_Layout.cshtml -->
+﻿@using Microsoft.AspNetCore.Http
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - ABC Retailers</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 
 <body class="bg-light">
 
-    <!-- Navbar -->
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
             <div class="container">
-                <a class="navbar-brand fw-bold text-primary" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="fas fa-store"></i> ABC Retailers
+                <a class="navbar-brand fw-semibold" asp-area="" asp-controller="Home" asp-action="Landing">
+                    <i class="fas fa-store me-2"></i>ABC Retailers
                 </a>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="fas fa-home"></i> Home
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Customer" asp-action="Index">
-                                <i class="fas fa-users"></i> Customers
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Product" asp-action="Index">
-                                <i class="fas fa-box"></i> Products
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Order" asp-action="Index">
-                                <i class="fas fa-shopping-cart"></i> Orders
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Upload" asp-action="Index">
-                                <i class="fas fa-upload"></i> Upload Files
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">
-                                <i class="fas fa-shield-alt"></i> Privacy
-                            </a>
-                        </li>
+
+                        @if (Context.Session.GetString("Username") != null)
+                        {
+                            var role = Context.Session.GetString("Role");
+                            var username = Context.Session.GetString("Username");
+                            int cartCount = ViewBag.CartCount ?? 0;
+
+
+                            @if (role == "Admin")
+                            {
+                                
+                                <!-- HOME -->
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                        <i class="fas fa-home me-1"></i>Dashboard
+                                    </a>
+                                </li>
+
+                                <!-- ADMIN MENU -->
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Customer" asp-action="Index">
+                                        <i class="fas fa-users me-1"></i>Customers
+                                    </a>
+                                </li>
+
+                                
+
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Product" asp-action="Index">
+                                        <i class="fas fa-box-open me-1"></i>Products
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Order" asp-action="Index">
+                                        <i class="fas fa-list-alt me-1"></i>Orders
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Upload" asp-action="Index">
+                                        <i class="fas fa-upload me-1"></i>Documents
+                                    </a>
+                                </li>
+                            }
+                            else if (role == "Customer")
+                            {
+                                <!-- CUSTOMER MENU -->
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Product" asp-action="Index">
+                                        <i class="fas fa-store me-1"></i>Products
+                                    </a>
+                                </li>
+
+                                <li class="nav-item position-relative">
+                                    <a class="nav-link" asp-controller="Cart" asp-action="Index">
+                                        <i class="fas fa-shopping-cart me-1"></i>Cart
+                                        @if (cartCount > 0)
+                                        {
+                                            <span class="badge bg-success position-absolute top-0 start-100 translate-middle rounded-pill">
+                                                @cartCount
+                                            </span>
+                                        }
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Order" asp-action="CustomerOrders">
+                                        <i class="fas fa-truck me-1"></i>Track Orders
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Customer" asp-action="Profile">
+                                        <i class="fas fa-user me-1"></i>Profile
+                                    </a>
+                                </li>
+                            }
+
+                            <!-- USER DROPDOWN -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-circle me-1"></i>@username
+                                </a>
+
+                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                    <li><span class="dropdown-item-text small text-muted">Signed in as @role</span></li>
+                                    <li><hr class="dropdown-divider" /></li>
+
+                                    @if (role == "Customer")
+                                    {
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Customer" asp-action="EditProfile">
+                                                <i class="fas fa-edit me-2"></i>Edit Profile
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider" /></li>
+                                    }
+
+                                    <li>
+                                        <form asp-controller="Login" asp-action="Logout" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="dropdown-item border-0 bg-transparent">
+                                                <i class="fas fa-sign-out-alt me-2"></i>Sign Out
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <!-- NOT LOGGED IN -->
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Login" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt me-1"></i>Sign In
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Login" asp-action="Register">
+                                    <i class="fas fa-user-plus me-1"></i>Register
+                                </a>
+                            </li>
+                        }
+
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
 
-    <!-- Page Content -->
     <div class="container my-4">
         <main role="main" class="pb-4">
-
-            <!-- Alerts styled as cards -->
             @if (TempData["Success"] != null)
             {
-                <div class="card border-success shadow-sm mb-3">
-                    <div class="card-body text-success">
-                        <i class="fas fa-check-circle"></i> @TempData["Success"]
-                    </div>
+                <div class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert">
+                    <i class="fas fa-check-circle me-2"></i> @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
 
             @if (TempData["Error"] != null)
             {
-                <div class="card border-danger shadow-sm mb-3">
-                    <div class="card-body text-danger">
-                        <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
-                    </div>
+                <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i> @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
 
@@ -88,22 +182,29 @@
         </main>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-white border-top py-3 mt-4">
-        <div class="container d-flex justify-content-between align-items-center">
-            <span class="text-muted">
-                &copy; 2025 - ABC Retailers -
-                <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-decoration-none">Privacy</a>
-            </span>
-            <span class="text-primary fw-semibold">
-                <i class="fas fa-store"></i> Your one-stop shop for the best products
-            </span>
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <span class="text-muted">
+                        &copy; 2025 ABC Retailers -
+                        <a asp-controller="Home" asp-action="Privacy" class="text-decoration-none text-light opacity-75">Privacy Policy</a>
+                    </span>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <span class="text-muted">
+                        <i class="fas fa-store me-1 opacity-75"></i> Premium Shopping Experience
+                    </span>
+                </div>
+            </div>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>
